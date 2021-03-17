@@ -1,16 +1,30 @@
-import 'dart:math';
-
 import 'package:rx_notifier/rx_notifier.dart';
 
 class HomeBloc {
-  RxFuture<int> getNumberRequest;
+  RxFuture getNumberRequest;
+  RxFuture<int> incrementRequest;
+
+  final counter = RxNotifier<int>(0);
 
   Future<int> _getNumber() async {
     await Future.delayed(Duration(seconds: 2));
-    return Random().nextInt(100);
+    return 5;
   }
 
-  void getRandomNumber() {
-    getNumberRequest = _getNumber();
+  Future<int> _add() async {
+    await Future.delayed(Duration(seconds: 1));
+    return counter.value++;
+  }
+
+  void increment() {
+    counter.value++;
+  }
+
+  void incrementFuture() {
+    incrementRequest = _add().asRx();
+  }
+
+  getRandomNumber() {
+    getNumberRequest = _getNumber().asRx();
   }
 }

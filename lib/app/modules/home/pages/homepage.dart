@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rx_notifier/rx_notifier.dart';
 import 'package:teste/app/modules/home/bloc/home-bloc.dart';
-import 'package:teste/app/shared/dto/driver-dto.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -10,11 +9,27 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   HomeBloc _homeBloc;
+  RxDisposer _incrementReactionDisposer;
 
   @override
   void initState() {
     _homeBloc = HomeBloc();
+    _incrementReactionDisposer = rxObserver(
+        () {
+          return _homeBloc.incrementRequest?.status;
+        },
+        filter: () =>
+            _homeBloc.incrementRequest.status == FutureStatus.fulfilled,
+        effect: (_) {
+          _homeBloc.counter.value = _homeBloc.incrementRequest.data;
+        });
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _incrementReactionDisposer();
+    super.dispose();
   }
 
   @override
@@ -22,19 +37,12 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: RxBuilder(
         builder: (_) {
-          return _homeBloc.getNumberRequest.status == FutureStatus.pending
-              ? CircularProgressIndicator()
-              : Container(
-                  child: Text('${_homeBloc.getNumberRequest.data ?? 'Zerado'}'),
-                );
+          return Center(child: Text(_homeBloc.counter.value.toString()));
         },
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.calculate),
-        onPressed: () {
-          Navigator.of(context)
-              .pushNamed('/home', arguments: new Driver.fromJson({}));
-        },
+        onPressed: _homeBloc.incrementFuture,
       ),
     );
   }
