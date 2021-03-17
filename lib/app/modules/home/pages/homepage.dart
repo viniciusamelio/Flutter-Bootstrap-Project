@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:rx_notifier/rx_notifier.dart';
 import 'package:teste/app/modules/home/bloc/home-bloc.dart';
 import 'package:teste/app/shared/dto/driver-dto.dart';
-import 'package:teste/app/shared/dto/user-dto.dart';
 
 class HomePage extends StatefulWidget {
   @override
